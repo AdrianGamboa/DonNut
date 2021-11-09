@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -19,72 +12,214 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  // ignore: non_constant_identifier_names
+  final List<String> ListCategories = [
+    'Top Ventas',
+    'Dulces',
+    'Saladas',
+  ];
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Image.network(
-            'https://thumbs.dreamstime.com/b/mordedura-de-choco-donnut-56785469.jpg',
-            height: 70,
-            width: 70),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'Donas a comprar :D ',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-          ],
+      appBar: PreferredSize(
+        //Barra superior de la pantalla
+        preferredSize: const Size.fromHeight(60.0),
+        child: AppBar(
+          backgroundColor: const Color(0xffFFFFFF),
+          title: Image.network(
+              'https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=998&height=676',
+              height: 70,
+              width: 70),
+          elevation: 0,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Decrement',
-        child: const Icon(Icons.add_a_photo),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: ListView(
+        //Parte central de la pantalla, zona donde se puede arrastrar para subir y bajar por las donas
+        children: <Widget>[
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              CarouselSlider(
+                //Banner tipo carrusel que va a mostrar promociones y descuentos en curso
+                options: CarouselOptions(
+                  height: 200.0,
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 5),
+                ),
+                items: [1, 20, 300, 455, 545].map((i) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Image.network(
+                              'https://picsum.photos/id/$i/600/400',
+                              fit: BoxFit.cover));
+                    },
+                  );
+                }).toList(),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 20.0),
+                height: 40.0,
+                child: ListView(scrollDirection: Axis.horizontal, children: [
+                  for (var i in ListCategories)
+                    Padding(
+                      padding: const EdgeInsets.all(5.5),
+                      child: Container(
+                        width: 130.0,
+                        alignment: Alignment.center,
+                        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          shape: BoxShape.rectangle,
+                          color: const Color(0xffFFFFFF),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 0.05,
+                              blurRadius: 1,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Text(i),
+                      ),
+                    )
+                ]),
+              ),
+            ],
+          ),
+          //Seccion de las donas mostradas segun la categoria seleccionada
+          Column(
+            children: [
+              for (var i = 0; i < 10; i++)
+                Padding(
+                    padding: const EdgeInsets.only(bottom: 28.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (var i = 0; i < 2; i++)
+                          Container(
+                            width: 155,
+                            height: 188,
+                            margin:
+                                const EdgeInsets.only(left: 14.0, right: 14.0),
+                            padding:
+                                const EdgeInsets.only(left: 12.0, right: 12.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Column(children: [
+                              const SizedBox(height: 10),
+                              Image.network(
+                                'https://media.discordapp.net/attachments/775922349362642955/907742592479944774/unknown.png',
+                                height: 91,
+                                width: 102,
+                                alignment: Alignment.topCenter,
+                              ),
+                              const SizedBox(height: 5),
+                              Container(
+                                  height: 45,
+                                  alignment: Alignment.center,
+                                  child: const AutoSizeText('Chocolate Chips',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Color(0xff707070)))),
+                              const SizedBox(height: 8),
+                              const AutoSizeText(
+                                '₡1000',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Color(0xffAD53AE),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20),
+                              ),
+                            ]),
+                          ),
+                      ],
+                    ))
+            ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: const NavBar(), //Barra de navegacion inferior
+    );
+  }
+}
+
+class NavBar extends StatefulWidget {
+  const NavBar({Key? key}) : super(key: key);
+
+  @override
+  State<NavBar> createState() => _NavBar();
+}
+
+class _NavBar extends State<NavBar> {
+  @override
+  Widget build(BuildContext context) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.black,
+      selectedFontSize: 14,
+      unselectedFontSize: 14,
+      showSelectedLabels: false,
+      showUnselectedLabels: false,
+      onTap: (value) {
+        if (value == 0) {
+          print('Vamos a home');
+        } else if (value == 1) {
+          print('Vamos a buscar');
+        }
+        if (value == 2) {
+          print('Vamos al carrito');
+        }
+        if (value == 3) {
+          print('Vamos al perfil');
+        }
+      },
+      items: const [
+        BottomNavigationBarItem(
+          label: 'Inicio',
+          icon: Icon(
+            Icons.home_outlined,
+            size: 35,
+          ),
+        ),
+        BottomNavigationBarItem(
+          label: 'Buscar',
+          icon: Icon(
+            Icons.search,
+            size: 35,
+          ),
+        ),
+        BottomNavigationBarItem(
+          label: 'Carrito',
+          icon: Icon(
+            Icons.shopping_cart_outlined,
+            size: 35,
+          ),
+        ),
+        BottomNavigationBarItem(
+          label: 'Perfil',
+          icon: Icon(
+            Icons.person_outline_outlined,
+            size: 35,
+          ),
+        ),
+      ],
     );
   }
 }
