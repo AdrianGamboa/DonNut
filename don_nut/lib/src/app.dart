@@ -1,3 +1,4 @@
+import 'package:don_nut/src/screens/product_info.dart';
 import 'screens/recover_password.dart';
 import 'screens/login.dart';
 import 'screens/register.dart';
@@ -9,10 +10,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Don-Nut',
-      theme: ThemeData(fontFamily: 'Segoe UI'),
       initialRoute: "/",
       routes: {
         "/": (BuildContext context) => const MyHomePage(title: 'Don-Donut'),
+        "/product_info": (BuildContext context) => const ProductInfoPage(),
         "/login": (BuildContext context) => const LoginPage(),
         "/register": (BuildContext context) => const RegisterPage(),
         "/recoverPass": (BuildContext context) => const RecoverPassPage()

@@ -1,5 +1,7 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -14,26 +16,28 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
-     body: Center(child: Column(
-       children: <Widget>[
-        const SizedBox(height: 100 ),
-        Image.network("https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=200&height=150"),
+      body: Center(
+          child: Column(
+        children: <Widget>[
+          const SizedBox(height: 100),
+          Image.network(
+              "https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=200&height=150"),
           const SizedBox(height: 25),
           SizedBox(
             width: 300,
             child: TextField(
               controller: emailTextController,
               keyboardType: TextInputType.emailAddress,
-              decoration:const InputDecoration(
-                labelText:"Email",
+              decoration: const InputDecoration(
+                labelText: "Email",
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
-                  color: Color(0xff707070),
-                  width: 1.0, ),
+                    color: Color(0xff707070),
+                    width: 1.0,
+                  ),
                 ),
                 focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
@@ -43,17 +47,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          
           SizedBox(
             width: 300,
             child: TextField(
               controller: passwordTextController,
-              decoration:const InputDecoration(
-                labelText:"Contraseña",
+              decoration: const InputDecoration(
+                labelText: "Contraseña",
                 enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(
                     color: Color(0xff707070),
-                    width: 1.0, 
+                    width: 1.0,
                   ),
                 ),
                 focusedBorder: UnderlineInputBorder(
@@ -64,46 +67,53 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-        
-        Container(
-          margin: const EdgeInsets.all(60),
-          width: 400,
-          child: ElevatedButton(
-            child:const Text("Ingresar"),
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              primary: const Color(0xffAD53AE), 
-              onPrimary: Colors.white,
-              shape:RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              textStyle: const TextStyle(
-                fontSize:18, 
-                fontWeight: FontWeight.w700
+          Container(
+            margin: const EdgeInsets.all(60),
+            width: 400,
+            child: ElevatedButton(
+              child: const Text("Ingresar"),
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                primary: const Color(0xffAD53AE),
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                textStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
               ),
             ),
           ),
-        ),
-        const Text.rich(
-          TextSpan(text: "¿Has olvidado tu contraseña? ",
-          style: TextStyle(color: Color(0xff707070)),
+          const Text.rich(
+            TextSpan(
+              text: "¿Has olvidado tu contraseña? ",
+              style: TextStyle(color: Color(0xff707070)),
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        const Text.rich(
-          TextSpan(text: "¿Aún no tiene cuenta? ",
-          style: TextStyle(color: Color(0xff707070)),
-            children: <TextSpan>[
-              TextSpan(text: "Registrate",
-              style: TextStyle(color: Color(0xffad53ae),fontWeight: FontWeight.bold))
-            ],
-          ),
-        )
-      ],
-     )),//bottomNavigationBar: const NavBar(), //Barra de navegacion inferior 
+          const SizedBox(height: 15),
+          Text.rich(
+            TextSpan(
+              text: "¿Aún no tiene cuenta? ",
+              style: const TextStyle(color: Color(0xff707070)),
+              children: [
+                TextSpan(
+                  text: "Registrate",
+                  style: const TextStyle(
+                      color: Color(0xffad53ae), fontWeight: FontWeight.bold),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.of(context).pushNamed("/register");
+                    },
+                )
+              ],
+            ),
+          )
+        ],
+      )), //bottomNavigationBar: const NavBar(), //Barra de navegacion inferior
       bottomNavigationBar: const NavBar(),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -122,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
     // ignore: avoid_print
     print('email: ${emailTextController.text}');
   }
+
   void _printPassword() {
     // ignore: avoid_print
     print('contra: ${passwordTextController.text}');
