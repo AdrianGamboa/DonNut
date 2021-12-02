@@ -2,13 +2,14 @@
 
 import 'dart:convert';
 
-import 'package:don_nut/src/models/productos.dart';
+import 'package:don_nut/src/models/producto.dart';
 import 'package:don_nut/src/screens/product_info.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:don_nut/src/utils/global.dart' as globals;
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -20,17 +21,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  late Future<List<Productos>> _listProducts;
-  late Future<List<Productos>> _listTopProducts;
+  late Future<List<Producto>> _listBanners;
+  late Future<List<Producto>> _listProducts;
+  late Future<List<Producto>> _listTopProducts;
 
-  Future<List<Productos>> _getProducts(url) async {
+  Future<List<Producto>> _getProducts(url) async {
     final response = await http.get(Uri.parse(url));
-    List<Productos> productos = [];
+    List<Producto> products = [];
     if (response.statusCode == 202) {
       String body = utf8.decode(response.bodyBytes);
       final jsonData = jsonDecode(body);
       for (var i in jsonData["data"]) {
-        productos.add(Productos(
+        products.add(Producto(
             i['idProducto'],
             i['nombre'],
             i['tipo'],
@@ -38,9 +40,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             i['imgProducto'],
             i['descripcion'],
             i['fechaRegistro'],
+            i['precio'],
             i['estado']));
       }
-      return productos;
+      return products;
     } else {
       throw Exception('Error en la conexión');
     }
@@ -50,10 +53,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _listProducts =
-        _getProducts("https://donnutdev.000webhostapp.com/api/productos");
+    _listProducts = _getProducts(globals.url + "productos");
     _listTopProducts = _getProducts(
-        "https://donnutdev.000webhostapp.com/api/productos/tipo/Saladas"); //Se carga el top ventas
+        globals.url + "productos/tipo/Saladas"); //Se carga el top ventas
+    _listBanners = _getProducts(
+        globals.url + "productos/tipo/Banners"); //Se cargan los banners
   }
 
   final List<String> listCategories = [
@@ -79,13 +83,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
           elevation: 0,
         ),
       ),
+      //Contenido de la pantalla
       body: DefaultTabController(
         length: listCategories.length,
         child: Scaffold(
             body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
+              //Banner tipo carrusel que va a mostrar promociones y descuentos en curso
               SliverAppBar(
+                automaticallyImplyLeading: false,
                 toolbarHeight: 250,
                 backgroundColor: Colors.white,
                 title: Container(
@@ -93,29 +100,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   height: 200,
                   width: MediaQuery.of(context).size.width,
                   child: Center(
-                      child: CarouselSlider(
-                    //Banner tipo carrusel que va a mostrar promociones y descuentos en curso
-                    options: CarouselOptions(
-                      height: 200.0,
-                      autoPlay: true,
-                      autoPlayInterval: const Duration(seconds: 5),
-                    ),
-                    items: [1, 20, 300, 455, 545].map((i) {
-                      return Builder(
-                        builder: (BuildContext context) {
-                          return Container(
-                              width: MediaQuery.of(context).size.width,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 6.0),
-                              child: Image.network(
-                                  'https://picsum.photos/id/$i/600/400',
-                                  fit: BoxFit.cover));
-                        },
-                      );
-                    }).toList(),
+                      child: FutureBuilder(
+                    future: _listBanners,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return _getBanners(snapshot.data, context);
+                      } else if (snapshot.hasError) {
+                        return Text("Error al extraer la información");
+                      }
+
+                      return Center(
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: CircularProgressIndicator()));
+                    },
                   )),
                 ),
               ),
+              //TabBar
               SliverAppBar(
                 backgroundColor: Colors.white,
                 toolbarHeight: 0,
@@ -124,9 +126,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 elevation: 1,
                 bottom: PreferredSize(
                   preferredSize:
-                      const Size.fromHeight(43.0), //Tamaño del TabBar
+                      const Size.fromHeight(55.0), //Tamaño del TabBar
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.only(bottom: 15),
                     child: TabBar(
                       unselectedLabelColor: Color(0xff707070),
                       indicatorSize: TabBarIndicatorSize.label,
@@ -136,8 +138,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.grey.withOpacity(0.5),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
+                            blurRadius: 2,
+                            offset: const Offset(0, 1),
                           ),
                         ],
                       ),
@@ -148,9 +150,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             height: 30,
                             padding: EdgeInsets.only(left: 10, right: 10),
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                    color: Color(0xffAD53AE), width: 1)),
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                CustomBoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    offset: Offset(0, 1),
+                                    blurRadius: 2,
+                                    blurStyle: BlurStyle.outer)
+                              ],
+                            ),
                             child: Tab(
                               child: Align(
                                 alignment: Alignment.center,
@@ -165,6 +173,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               ),
             ];
           },
+          //Tabs
           body: Container(
             color: Colors.white,
             child: TabBarView(
@@ -196,7 +205,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   }
 
 //Recibe como parametro la lista de productos, junto a la categoria
-  Widget productCategory(_products, tipo) {
+//Establece a los productos de esa categoria en un mismo GridView
+  Widget productCategory(_products, _category) {
     return FutureBuilder(
       future: _products,
       builder: (context, snapshot) {
@@ -209,23 +219,26 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 mainAxisSpacing: 22,
-                children: _listProductsM(snapshot.data, tipo)),
+                children: _listProductsM(snapshot.data, _category)),
           );
         } else if (snapshot.hasError) {
           return Text("Error al extraer la información");
         }
 
-        return Center(child: CircularProgressIndicator());
+        return Center(
+            child: Padding(
+                padding: EdgeInsets.only(top: 5),
+                child: CircularProgressIndicator()));
       },
     );
   }
 
 //Metodo que devuelve la lista de los productos a mostrar ya colocados en sus "cajones"
-  List<Widget> _listProductsM(data, tipo) {
+  List<Widget> _listProductsM(data, category) {
     List<Widget> products = [];
 
     for (var item in data) {
-      if (item.tipo == tipo || tipo == 'Top Ventas') {
+      if (item.tipo == category || category == 'Top Ventas') {
         products.add(
           GestureDetector(
             onTap: () {
@@ -233,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                   arguments: ProductPageArguments(
                       nombre: item.nombre,
                       descripcion: item.descripcion,
-                      costo: "1000",
+                      costo: item.precio,
                       imagen: item.imgProducto));
             },
             child: Container(
@@ -268,8 +281,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         style:
                             TextStyle(fontSize: 20, color: Color(0xff707070)))),
                 const SizedBox(height: 8),
-                const AutoSizeText(
-                  '₡1000',
+                AutoSizeText(
+                  '₡' + item.precio,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Color(0xffAD53AE),
@@ -285,6 +298,36 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
     return products;
   }
+}
+
+Widget _getBanners(data, context) {
+  List<Widget> banners = [];
+  for (var item in data) {
+    banners.add(Container(
+        width: 260,
+        decoration: BoxDecoration(color: Color(0xffC4C2C2)),
+        constraints: BoxConstraints(
+          maxWidth: 260,
+        ),
+        child: Image.network(
+          item.imgBanner,
+          fit: BoxFit.fill,
+        )));
+  }
+
+  return Container(
+    color: Colors.white,
+    height: 200,
+    width: MediaQuery.of(context).size.width,
+    child: Center(
+        child: CarouselSlider(
+            options: CarouselOptions(
+              height: 200.0,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 5),
+            ),
+            items: banners)),
+  );
 }
 
 //Widget que establace la barra de navegacion inferior
@@ -309,7 +352,7 @@ class _NavBar extends State<NavBar> {
       showUnselectedLabels: false,
       onTap: (value) {
         if (value == 0) {
-          print('Vamos a home');
+          Navigator.of(context).pushNamed("/");
         } else if (value == 1) {
           print('Vamos a buscar');
         }
@@ -354,11 +397,42 @@ class _NavBar extends State<NavBar> {
   }
 }
 
-//Elimina el efecto de arrastrado final del ListView
+//Elimina el efecto de arrastrado al final del ListView
 class ListViewGlow extends ScrollBehavior {
   @override
   Widget buildViewportChrome(
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
+  }
+}
+
+//Permite establecer una sombra personalizada a los widgets
+class CustomBoxShadow extends BoxShadow {
+  final BlurStyle blurStyle;
+
+  const CustomBoxShadow({
+    Color color = const Color(0xFF000000),
+    Offset offset = Offset.zero,
+    double blurRadius = 0.0,
+    double spreadRadius = 0.0,
+    this.blurStyle = BlurStyle.normal,
+  }) : super(
+            color: color,
+            offset: offset,
+            blurRadius: blurRadius,
+            spreadRadius: spreadRadius);
+
+  @override
+  Paint toPaint() {
+    final Paint result = Paint()
+      ..color = color
+      ..maskFilter = MaskFilter.blur(blurStyle, blurSigma);
+    assert(() {
+      if (debugDisableShadows) {
+        result.maskFilter = null;
+      }
+      return true;
+    }());
+    return result;
   }
 }

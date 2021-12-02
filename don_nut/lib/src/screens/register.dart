@@ -145,7 +145,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: 320,
                     child: TextFormField(
                       decoration: const InputDecoration(
-                        labelText: "password:",
+                        labelText: "Password:",
                         enabledBorder: UnderlineInputBorder(
                           borderSide: BorderSide(
                             color: Color(0xff707070),
@@ -237,7 +237,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 15),
                   Text.rich(TextSpan(
                       text: '¿Ya tienes cuenta?',
-                      style: TextStyle(color: Color(0xff707070)),
+                      style: const TextStyle(color: Color(0xff707070)),
                       children: <TextSpan>[
                         TextSpan(
                           text: ' Iniciar sesión',
