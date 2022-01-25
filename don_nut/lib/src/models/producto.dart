@@ -5,9 +5,9 @@ class Producto {
   String? imgBanner;
   String imgProducto;
   String descripcion;
-  String fechaRegistro;
+  String? fechaRegistro;
   String precio;
-  String estado;
+  String? estado;
 
   Producto(
       this.idProducto,

@@ -1,6 +1,5 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
 
 class ProductInfoPage extends StatefulWidget {
   const ProductInfoPage({Key? key}) : super(key: key);
@@ -12,7 +11,7 @@ class ProductInfoPage extends StatefulWidget {
 class _ProductInfoPageState extends State<ProductInfoPage> {
   int cont = 1;
   void contadorMas() {
-    if (cont > -1) {
+    if (cont > -1 && cont < 99) {
       setState(() {
         cont++;
       });
@@ -33,7 +32,6 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
         ModalRoute.of(context)!.settings.arguments as ProductPageArguments;
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
       appBar: PreferredSize(
         //Barra superior de la pantalla
         preferredSize: const Size.fromHeight(60.0),
@@ -48,69 +46,89 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
           elevation: 0,
         ),
       ),
-      body: Center(
-          child: Column(
-        children: <Widget>[
+      body: ListView(
+        physics: const ClampingScrollPhysics(),
+        children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Column(
-                children: [
-                  SizedBox(
-                    width: 180,
-                    child: AutoSizeText(
-                      arguments.nombre,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          color: Color(0xff707070),
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20),
+              SizedBox(
+                width: 240,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: AutoSizeText(
+                        arguments.nombre,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                            color: Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    arguments.descripcion,
-                    style:
-                        const TextStyle(color: Color(0xff707070), fontSize: 14),
-                  ),
-                  const SizedBox(height: 10),
-                  Text.rich(TextSpan(
-                      text: "₡" + arguments.costo,
-                      style: const TextStyle(
-                          color: Color(0xffAD53AE),
-                          fontWeight: FontWeight.w600),
-                      children: const <TextSpan>[
-                        TextSpan(
-                          text: ' c/u',
-                          style: TextStyle(
-                              color: Color(0xff707070),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: 200,
+                      child: AutoSizeText(
+                        arguments.descripcion,
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                            color: Color(0xff707070), fontSize: 14),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: 200,
+                      child: Text.rich(TextSpan(
+                          text: "₡" + arguments.costo,
+                          style: const TextStyle(
+                              color: Color(0xffAD53AE),
                               fontWeight: FontWeight.w600),
-                        )
-                      ]))
-                ],
+                          children: const <TextSpan>[
+                            TextSpan(
+                              text: ' c/u',
+                              style: TextStyle(
+                                  color: Color(0xff707070),
+                                  fontWeight: FontWeight.w600),
+                            )
+                          ])),
+                    )
+                  ],
+                ),
               ),
               Image.network(arguments.imagen, height: 150, width: 150),
             ],
           ),
           const SizedBox(height: 90),
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Unidades",
-                style: TextStyle(color: Colors.black, fontSize: 20),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  "Unidades",
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
               ),
               const SizedBox(height: 20),
               Container(
-                padding: EdgeInsets.zero,
-                margin: EdgeInsets.zero,
-                width: 180,
+                width: 150,
                 height: 40,
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(30))),
+                margin: const EdgeInsets.only(left: 20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(30)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 1,
+                      blurRadius: 7,
+                      offset: const Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     ElevatedButton(
                       child: const Text("-"),
@@ -119,38 +137,54 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                       },
                       style: ElevatedButton.styleFrom(
                         shape: const CircleBorder(),
-                        primary: const Color(0xffAD53AE),
+                        primary: Colors.white,
+                        onPrimary: const Color(0xffAD53AE),
+                        padding: EdgeInsets.zero,
+                        elevation: 0.0,
+                        shadowColor: Colors.transparent,
                         textStyle: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w700),
+                            fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ),
-                    Text('    $cont    ',
-                        style:
-                            const TextStyle(color: Colors.black, fontSize: 18)),
+                    SizedBox(
+                      width: 22,
+                      child: Text('$cont',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: Colors.black, fontSize: 18)),
+                    ),
                     ElevatedButton(
                       child: const Text("+"),
                       onPressed: () {
                         contadorMas();
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xffAD53AE),
+                        primary: Colors.white,
+                        onPrimary: const Color(0xffAD53AE),
+                        padding: EdgeInsets.zero,
                         shape: const CircleBorder(),
+                        elevation: 0.0,
+                        shadowColor: Colors.transparent,
                         textStyle: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w700),
+                            fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 90),
-              const Text(
-                "Observaciones",
-                style: TextStyle(color: Colors.black, fontSize: 20),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  "Observaciones",
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
               ),
               const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25),
                 child: TextFormField(
+                  scrollPadding: const EdgeInsets.only(bottom: 200),
                   minLines: 2,
                   maxLength: 200,
                   maxLines: 4,
@@ -175,7 +209,8 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                     right: 40, left: 40, top: 20, bottom: 20),
                 width: 400,
                 child: ElevatedButton(
-                  child: Text("Agregar al pedido ₡" + arguments.costo),
+                  child: Text("Agregar al pedido ₡" +
+                      (int.parse(arguments.costo) * cont).toString()),
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     primary: const Color(0xffAD53AE),
@@ -188,10 +223,9 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                 ),
               ),
             ],
-          )
+          ),
         ],
-      )), //bottomNavigationBar: const NavBar(), //Barra de navegacion inferior
-      bottomNavigationBar: const NavBar(),
+      ),
     );
   }
 }

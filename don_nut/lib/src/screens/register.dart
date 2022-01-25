@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -256,7 +255,6 @@ class _RegisterPageState extends State<RegisterPage> {
           ],
         ),
       ),
-      bottomNavigationBar: const NavBar(),
     );
   }
 }
