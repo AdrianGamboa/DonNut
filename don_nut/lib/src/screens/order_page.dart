@@ -95,117 +95,111 @@ class OrderPageState extends State<OrderPage> {
           elevation: 0,
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
-            child: ListView(
-              scrollDirection: Axis.vertical,
-              shrinkWrap: true,
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(left: 10, right: 10),
-                  child: const Text("Mi pedido",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500)),
-                ),
-                const SizedBox(height: 20),
-                FutureBuilder(
-                  future: _listOrder,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return Column(
-                        children: [
-                          Container(
-                            height: 420,
-                            margin: const EdgeInsets.only(bottom: 20),
-                            child: ListView(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    width: 500,
+                    child: Text("Mi pedido",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500)),
+                  ),
+                  const SizedBox(height: 20),
+                  FutureBuilder(
+                    future: _listOrder,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Column(
+                          children: [
+                            ListView(
                                 scrollDirection: Axis.vertical,
                                 shrinkWrap: true,
+                                primary: false,
+                                physics: const NeverScrollableScrollPhysics(),
                                 children:
                                     _getProductsOrder(snapshot.data, context)),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(left: 10, right: 10),
-                            alignment: Alignment.centerLeft,
-                            child: Text.rich(
-                              TextSpan(
-                                text: "Subtotal: ",
-                                style:
-                                    const TextStyle(color: Color(0xff707070)),
-                                children: [
-                                  TextSpan(
-                                    text: "₡" + subtotal.toString(),
-                                    style: const TextStyle(
-                                        color: Color(0xffad53ae),
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                            Container(
+                              margin:
+                                  const EdgeInsets.only(left: 10, right: 10),
+                              alignment: Alignment.centerLeft,
+                              child: Text.rich(
+                                TextSpan(
+                                  text: "Subtotal: ",
+                                  style:
+                                      const TextStyle(color: Color(0xff707070)),
+                                  children: [
+                                    TextSpan(
+                                      text: "₡" + subtotal.toString(),
+                                      style: const TextStyle(
+                                          color: Color(0xffad53ae),
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      );
-                    } else if (snapshot.hasError) {
-                      return const Text("Error al extraer la información");
-                    }
-                    return const Center(
-                        child: Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: CircularProgressIndicator()));
-                  },
-                ),
-              ],
-            ),
-          ),
-          const Divider(
-            indent: 30,
-            endIndent: 30,
-            height: 40,
-            thickness: 0.6,
-            color: Colors.black,
-          ),
-          Container(
-            alignment: Alignment.center,
-            margin: const EdgeInsets.only(left: 30, right: 30),
-            child: Text.rich(
-              TextSpan(
-                text: "¿Desea aclararnos algo?  ",
-                style: const TextStyle(color: Color(0xff707070)),
-                children: [
-                  TextSpan(
-                    text: "Añadir observación",
-                    style: const TextStyle(
-                        color: Color(0xffad53ae), fontWeight: FontWeight.bold),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).pushNamed("/register");
-                      },
-                  )
+                          ],
+                        );
+                      } else if (snapshot.hasError) {
+                        return const Text("Error al extraer la información");
+                      }
+                      return const Center(
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: CircularProgressIndicator()));
+                    },
+                  ),
                 ],
               ),
             ),
-          ),
-          Container(
-            margin:
-                const EdgeInsets.only(right: 30, left: 30, top: 20, bottom: 20),
-            width: 400,
-            child: ElevatedButton(
-              child: const Text("Procesar pedido"),
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                primary: const Color(0xffAD53AE),
-                onPrimary: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+            const SizedBox(height: 20),
+            Container(
+              alignment: Alignment.center,
+              margin: const EdgeInsets.only(left: 30, right: 30),
+              child: Text.rich(
+                TextSpan(
+                  text: "¿Desea aclararnos algo?  ",
+                  style: const TextStyle(color: Color(0xff707070)),
+                  children: [
+                    TextSpan(
+                      text: "Añadir observación",
+                      style: const TextStyle(
+                          color: Color(0xffad53ae),
+                          fontWeight: FontWeight.bold),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).pushNamed("/register");
+                        },
+                    )
+                  ],
                 ),
-                textStyle: const TextStyle(fontSize: 18),
               ),
             ),
-          ),
-        ],
+            Container(
+              margin: const EdgeInsets.only(
+                  right: 30, left: 30, top: 20, bottom: 20),
+              width: 400,
+              child: ElevatedButton(
+                child: const Text("Procesar pedido"),
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  primary: const Color(0xffAD53AE),
+                  onPrimary: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  textStyle: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
