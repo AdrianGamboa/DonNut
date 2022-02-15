@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:don_nut/src/models/order.dart';
 import 'package:don_nut/src/models/producto.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:async';
@@ -10,20 +9,16 @@ import 'package:http/http.dart' as http;
 import '../utils/global.dart';
 import 'package:don_nut/src/utils/global.dart' as globals;
 
-import 'location.dart';
-
-final ObservacionPedidoTextController = TextEditingController();
-
-class OrderPage extends StatefulWidget {
-  const OrderPage({Key? key}) : super(key: key);
+class PreviewPage extends StatefulWidget {
+  const PreviewPage({Key? key}) : super(key: key);
  
   @override
-  State<OrderPage> createState() => OrderPageState();
+  State<PreviewPage> createState() => PreviewPageState();
 }
 
 int subtotal = 0;
 
-class OrderPageState extends State<OrderPage> {
+class PreviewPageState extends State<PreviewPage> {
   late Future<List<Order>> _listOrder; //Lista del carrito
 
   Future<List<Order>> _getOrder(url) async {
@@ -72,6 +67,8 @@ class OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final arguments =
+    ModalRoute.of(context)!.settings.arguments as PreviewDetailArguments;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -81,19 +78,11 @@ class OrderPageState extends State<OrderPage> {
           backgroundColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.black),
           title:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             Image.network(
                 'https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=998&height=676',
                 height: 70,
                 width: 70),
-            TextButton(
-              style: TextButton.styleFrom(
-                  textStyle: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                  primary: Colors.black),
-              onPressed: () {},
-              child: const Text('Editar'),
-            ),
           ]),
           elevation: 0,
         ),
@@ -111,7 +100,7 @@ class OrderPageState extends State<OrderPage> {
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
-                            fontWeight: FontWeight.w500)),
+                            fontWeight: FontWeight.w400)),
                   ),
                   const SizedBox(height: 20),
                   FutureBuilder(
@@ -162,41 +151,91 @@ class OrderPageState extends State<OrderPage> {
               ),
             ),
             const SizedBox(height: 20),
-            Container(
-              alignment: Alignment.center,
-              margin: const EdgeInsets.only(left: 30, right: 30),
-              child: Text.rich(
-                TextSpan(
-                  text: "¿Desea aclararnos algo?  ",
-                  style: const TextStyle(color: Color(0xff707070)),
-                  children: [
-                    TextSpan(
-                      text: "Añadir observación",
-                      style: const TextStyle(
-                          color: Color(0xffad53ae),
-                          fontWeight: FontWeight.bold),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          showObservationPage();
-                        },
-                    )
-                  ],
-                ),
+            const Divider(
+              indent: 30,
+              endIndent: 30,
+              thickness: 1,
+              color: Colors.black,
+            ),
+             Container(
+              margin: const EdgeInsets.all(30.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Text("Observaciones",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w400,)),
+                ],
               ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(left: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Text("Pedido:",
+                              style: TextStyle(
+                                  color: Color(0xff707070),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.only(left: 50,right: 20),
+              child: Text(arguments.observacionPedido,
+                  style: const TextStyle(
+                  color: Color(0xff707070),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,)),
+            ),
+            const Divider(
+              indent: 50,
+              endIndent: 50,
+              thickness: 1,
+              color: Color(0xffAD53AE),
+            ),
+            const SizedBox(height: 50),
+            Container(
+              margin: const EdgeInsets.only(left: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: const [
+                  Text("Ubicación:",
+                              style: TextStyle(
+                                  color: Color(0xff707070),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.only(left: 50,right: 20),
+              child: Text(arguments.observacionUbicacion,
+                  style: const TextStyle(
+                  color: Color(0xff707070),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,)),
+            ),
+            const Divider(
+              indent: 50,
+              endIndent: 50,
+              thickness: 1,
+              color: Color(0xffAD53AE),
             ),
             Container(
               margin: const EdgeInsets.only(
                   right: 30, left: 30, top: 20, bottom: 20),
               width: 400,
               child: ElevatedButton(
-                child: const Text("Procesar pedido"),
-                onPressed: () {
-                   Navigator.of(context).pushNamed("/location",
-                arguments: LocationDetailArguments(
-                      observacionPedido: ObservacionPedidoTextController.text,
-                    )
-                    );
-                },
+                child: const Text("Realizar pedido",style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500)),
+                onPressed: () {sendLocation(arguments.ubicLatitud, arguments.ubicLongitud,arguments.observacionUbicacion,arguments.observacionPedido);},
                 style: ElevatedButton.styleFrom(
                   primary: const Color(0xffAD53AE),
                   onPrimary: Colors.white,
@@ -211,57 +250,29 @@ class OrderPageState extends State<OrderPage> {
         ),
       ),
     );
+    
   }
-  void showObservationPage() {
-  showModalBottomSheet(
-    shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0))),
-    backgroundColor: Colors.white,
-    context: context,
-    isScrollControlled: true,
-    builder: (context) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal:18 ),
-      child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(height: 40,),
-              Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: TextField(
-            controller: ObservacionPedidoTextController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: "Observación del pedido",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xff707070),
-                  width: 1.0,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xffAD53AE),
-                ),
-              ),
-            ),
-          ),
-              ),
-               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(onPressed: () {Navigator.of(context).pop('Aceptar');}, child: const Text("Aceptar"), style: TextButton.styleFrom(primary: const Color(0xffAD53AE))),
-                ],
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
-    ));
+  Future<http.Response> sendLocation(
+      latitud, longitud, observacionUbicacion, observacionPedido) async {
+        var resBody = {};
+        resBody["ubicLatitud"] = latitud;
+        resBody["ubicLongitud"] = longitud;
+        resBody["observacionUbicacion"] = observacionUbicacion;
+        resBody["observacionPedido"] = observacionPedido;
+        var pedido = {};
+        pedido["pedido"] = resBody;
+    final response = await http.post(
+        Uri.parse(url + 'pedidos'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(pedido)
+        );
+    
+    return response;
   }
-}
-
 List<Widget> _getProductsOrder(data, context) {
   List<Widget> products = [];
   int _subtotal = 0;
@@ -320,4 +331,18 @@ List<Widget> _getProductsOrder(data, context) {
   }
 
   return products;
+}
+}
+class PreviewDetailArguments {
+  String observacionPedido;
+  String observacionUbicacion;
+  String ubicLatitud;
+  String ubicLongitud;
+  PreviewDetailArguments(
+      {
+        required this.observacionPedido,
+        required this.observacionUbicacion,
+        required this.ubicLatitud,
+        required this.ubicLongitud
+     });
 }

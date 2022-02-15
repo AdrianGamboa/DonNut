@@ -248,6 +248,7 @@ List<Widget> _listProducts(data, category, context) {
 
 Widget _getBanners(data, context) {
   List<Widget> banners = [];
+  // ignore: unused_local_variable
   for (var item in data) {
     banners.add(Container(
         width: 260,
