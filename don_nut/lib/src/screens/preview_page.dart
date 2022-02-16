@@ -11,7 +11,7 @@ import 'package:don_nut/src/utils/global.dart' as globals;
 
 class PreviewPage extends StatefulWidget {
   const PreviewPage({Key? key}) : super(key: key);
- 
+
   @override
   State<PreviewPage> createState() => PreviewPageState();
 }
@@ -68,7 +68,7 @@ class PreviewPageState extends State<PreviewPage> {
   @override
   Widget build(BuildContext context) {
     final arguments =
-    ModalRoute.of(context)!.settings.arguments as PreviewDetailArguments;
+        ModalRoute.of(context)!.settings.arguments as PreviewDetailArguments;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -77,8 +77,7 @@ class PreviewPageState extends State<PreviewPage> {
         child: AppBar(
           backgroundColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.black),
-          title:
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          title: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             Image.network(
                 'https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=998&height=676',
                 height: 70,
@@ -157,16 +156,17 @@ class PreviewPageState extends State<PreviewPage> {
               thickness: 1,
               color: Colors.black,
             ),
-             Container(
+            Container(
               margin: const EdgeInsets.all(30.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: const [
                   Text("Observaciones",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w400,)),
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                      )),
                 ],
               ),
             ),
@@ -176,21 +176,23 @@ class PreviewPageState extends State<PreviewPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: const [
                   Text("Pedido:",
-                              style: TextStyle(
-                                  color: Color(0xff707070),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,)),
+                      style: TextStyle(
+                        color: Color(0xff707070),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      )),
                 ],
               ),
             ),
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.only(left: 50,right: 20),
+              padding: const EdgeInsets.only(left: 50, right: 20),
               child: Text(arguments.observacionPedido,
                   style: const TextStyle(
-                  color: Color(0xff707070),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,)),
+                    color: Color(0xff707070),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
             const Divider(
               indent: 50,
@@ -205,21 +207,23 @@ class PreviewPageState extends State<PreviewPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: const [
                   Text("Ubicación:",
-                              style: TextStyle(
-                                  color: Color(0xff707070),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,)),
+                      style: TextStyle(
+                        color: Color(0xff707070),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      )),
                 ],
               ),
             ),
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.only(left: 50,right: 20),
+              padding: const EdgeInsets.only(left: 50, right: 20),
               child: Text(arguments.observacionUbicacion,
                   style: const TextStyle(
-                  color: Color(0xff707070),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,)),
+                    color: Color(0xff707070),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                  )),
             ),
             const Divider(
               indent: 50,
@@ -232,10 +236,18 @@ class PreviewPageState extends State<PreviewPage> {
                   right: 30, left: 30, top: 20, bottom: 20),
               width: 400,
               child: ElevatedButton(
-                child: const Text("Realizar pedido",style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500)),
-                onPressed: () {sendLocation(arguments.ubicLatitud, arguments.ubicLongitud,arguments.observacionUbicacion,arguments.observacionPedido);},
+                child: const Text("Realizar pedido",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                onPressed: () {
+                  sendLocation(
+                          arguments.ubicLatitud,
+                          arguments.ubicLongitud,
+                          arguments.observacionUbicacion,
+                          arguments.observacionPedido)
+                      .then((value) => Navigator.of(context)
+                          .popUntil((route) => route.isFirst));
+                },
                 style: ElevatedButton.styleFrom(
                   primary: const Color(0xffAD53AE),
                   onPrimary: Colors.white,
@@ -250,99 +262,108 @@ class PreviewPageState extends State<PreviewPage> {
         ),
       ),
     );
-    
   }
+
   Future<http.Response> sendLocation(
       latitud, longitud, observacionUbicacion, observacionPedido) async {
-        var resBody = {};
-        resBody["ubicLatitud"] = latitud;
-        resBody["ubicLongitud"] = longitud;
-        resBody["observacionUbicacion"] = observacionUbicacion;
-        resBody["observacionPedido"] = observacionPedido;
-        var pedido = {};
-        pedido["pedido"] = resBody;
-    final response = await http.post(
-        Uri.parse(url + 'pedidos'),
+    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(observacionPedido)) {
+      observacionPedido = 'Sin observación';
+    }
+    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(observacionUbicacion)) {
+      observacionUbicacion = 'Sin observación';
+    }
+
+    var resBody = {};
+
+    resBody["ubicLatitud"] = latitud;
+    resBody["ubicLongitud"] = longitud;
+    resBody["observacionUbicacion"] = observacionUbicacion;
+    resBody["observacionPedido"] = observacionPedido;
+    var pedido = {};
+    pedido["pedido"] = resBody;
+
+    final response = await http.post(Uri.parse(url + 'pedidos'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Accept': 'application/json',
           'Authorization': 'Bearer $token'
         },
-        body: jsonEncode(pedido)
-        );
-    
+        body: jsonEncode(pedido));
+
     return response;
   }
-List<Widget> _getProductsOrder(data, context) {
-  List<Widget> products = [];
-  int _subtotal = 0;
-  for (var item in data) {
-    _subtotal =
-        (_subtotal + (int.parse(item.producto.precio) * item.cantidad)) as int;
-    products.add(Container(
-      margin: const EdgeInsets.only(left: 10, right: 10),
-      height: 80,
-      width: 155,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          AutoSizeText(
-            item.cantidad.toString() + 'x ' + item.producto.nombre,
-            maxLines: 2,
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-                color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(height: 10),
-          AutoSizeText(
-            item.producto.descripcion,
-            maxLines: 2,
-            textAlign: TextAlign.start,
-            style: const TextStyle(color: Color(0xff707070), fontSize: 14),
-          ),
-          const SizedBox(height: 10),
-          Text.rich(
-            TextSpan(
-              text: "Total ",
-              style: const TextStyle(color: Color(0xff707070)),
-              children: [
-                TextSpan(
-                  text: "₡" +
-                      (int.parse(item.producto.precio) * item.cantidad)
-                          .toString(),
-                  style: const TextStyle(
-                      color: Color(0xffad53ae), fontWeight: FontWeight.bold),
-                )
-              ],
+
+  List<Widget> _getProductsOrder(data, context) {
+    List<Widget> products = [];
+    int _subtotal = 0;
+    for (var item in data) {
+      _subtotal = (_subtotal +
+          (int.parse(item.producto.precio) * item.cantidad)) as int;
+      products.add(Container(
+        margin: const EdgeInsets.only(left: 10, right: 10),
+        height: 80,
+        width: 155,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AutoSizeText(
+              item.cantidad.toString() + 'x ' + item.producto.nombre,
+              maxLines: 2,
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500),
             ),
-          ),
-        ],
-      ),
-    ));
+            const SizedBox(height: 10),
+            AutoSizeText(
+              item.producto.descripcion,
+              maxLines: 2,
+              textAlign: TextAlign.start,
+              style: const TextStyle(color: Color(0xff707070), fontSize: 14),
+            ),
+            const SizedBox(height: 10),
+            Text.rich(
+              TextSpan(
+                text: "Total ",
+                style: const TextStyle(color: Color(0xff707070)),
+                children: [
+                  TextSpan(
+                    text: "₡" +
+                        (int.parse(item.producto.precio) * item.cantidad)
+                            .toString(),
+                    style: const TextStyle(
+                        color: Color(0xffad53ae), fontWeight: FontWeight.bold),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ));
 
-    products.add(
-      const Divider(
-        height: 40,
-        thickness: 0.6,
-        color: Colors.black,
-      ),
-    );
-    subtotal = _subtotal;
+      products.add(
+        const Divider(
+          height: 40,
+          thickness: 0.6,
+          color: Colors.black,
+        ),
+      );
+      subtotal = _subtotal;
+    }
+
+    return products;
   }
+}
 
-  return products;
-}
-}
 class PreviewDetailArguments {
   String observacionPedido;
   String observacionUbicacion;
   String ubicLatitud;
   String ubicLongitud;
   PreviewDetailArguments(
-      {
-        required this.observacionPedido,
-        required this.observacionUbicacion,
-        required this.ubicLatitud,
-        required this.ubicLongitud
-     });
+      {required this.observacionPedido,
+      required this.observacionUbicacion,
+      required this.ubicLatitud,
+      required this.ubicLongitud});
 }

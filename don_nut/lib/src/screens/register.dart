@@ -245,7 +245,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.w600),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
-                              Navigator.of(context).pushNamed("/login");
+                              Navigator.pop(context);
                             },
                         )
                       ]))

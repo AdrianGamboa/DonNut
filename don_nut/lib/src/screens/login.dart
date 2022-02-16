@@ -1,137 +1,137 @@
+import 'package:don_nut/src/screens/user_profile.dart';
 import 'package:don_nut/src/utils/global.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:don_nut/src/services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  const LoginPage({Key? key, required this.setCurrentPageState})
+      : super(key: key);
 
+  final dynamic setCurrentPageState;
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final emailTextController = TextEditingController();
+  AuthService authServices = AuthService();
 
+  final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Column(
-      children: <Widget>[
-        const SizedBox(height: 100),
-        Image.network(
-            "https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=200&height=150"),
-        const SizedBox(height: 25),
-        SizedBox(
-          width: 300,
-          child: TextField(
-            controller: emailTextController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: "Email",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xff707070),
-                  width: 1.0,
+    return SingleChildScrollView(
+      child: Center(
+          child: Column(
+        children: <Widget>[
+          const SizedBox(height: 100),
+          Image.network(
+              "https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=200&height=150"),
+          const SizedBox(height: 25),
+          SizedBox(
+            width: 300,
+            child: TextField(
+              controller: emailTextController,
+              keyboardType: TextInputType.emailAddress,
+              decoration: const InputDecoration(
+                labelText: "Email",
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xff707070),
+                    width: 1.0,
+                  ),
                 ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xffAD53AE),
-                ),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: 300,
-          child: TextField(
-            controller: passwordTextController,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              labelText: "Contraseña",
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xff707070),
-                  width: 1.0,
-                ),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color(0xffAD53AE),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xffAD53AE),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        Container(
-          margin: const EdgeInsets.all(60),
-          width: 400,
-          child: ElevatedButton(
-            child: const Text("Ingresar"),
-            onPressed: login,
-            style: ElevatedButton.styleFrom(
-              primary: const Color(0xffAD53AE),
-              onPrimary: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+          SizedBox(
+            width: 300,
+            child: TextField(
+              controller: passwordTextController,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: const InputDecoration(
+                labelText: "Contraseña",
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xff707070),
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color(0xffAD53AE),
+                  ),
+                ),
               ),
-              textStyle:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
-        ),
-        const Text.rich(
-          TextSpan(
-            text: "¿Has olvidado tu contraseña? ",
-            style: TextStyle(color: Color(0xff707070)),
+          Container(
+            margin: const EdgeInsets.all(60),
+            width: 400,
+            child: ElevatedButton(
+              child: const Text("Ingresar"),
+              onPressed: () {
+                login(widget.setCurrentPageState);
+              },
+              style: ElevatedButton.styleFrom(
+                primary: const Color(0xffAD53AE),
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                textStyle:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        Text.rich(
-          TextSpan(
-            text: "¿Aún no tiene cuenta? ",
-            style: const TextStyle(color: Color(0xff707070)),
-            children: [
-              TextSpan(
-                text: "Registrate",
-                style: const TextStyle(
-                    color: Color(0xffad53ae), fontWeight: FontWeight.bold),
-                recognizer: TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.of(context).pushNamed("/register");
-                  },
-              )
-            ],
+          const Text.rich(
+            TextSpan(
+              text: "¿Has olvidado tu contraseña? ",
+              style: TextStyle(color: Color(0xff707070)),
+            ),
           ),
-        ),
-      ],
-    ));
+          const SizedBox(height: 15),
+          Text.rich(
+            TextSpan(
+              text: "¿Aún no tiene cuenta? ",
+              style: const TextStyle(color: Color(0xff707070)),
+              children: [
+                TextSpan(
+                  text: "Registrate",
+                  style: const TextStyle(
+                      color: Color(0xffad53ae), fontWeight: FontWeight.bold),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.of(context).pushNamed("/register");
+                    },
+                )
+              ],
+            ),
+          ),
+        ],
+      )),
+    );
   }
 
-  void login() async {
-    final response = await http.post(
-      Uri.parse(url + 'auth/login'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        "email": emailTextController.text,
-        "password": passwordTextController.text
-      }),
-    );
+  login(setCurrentPageState) async {
+    final response = await authServices.login(
+        emailTextController.text, passwordTextController.text);
 
     if (response.statusCode == 200) {
-      token = json.decode(response.body)['token'];
-      GetStorage().write('email', emailTextController.text);
-      GetStorage().write('password', passwordTextController.text);
-    } else if (response.statusCode == 401) {
+      UserProfile userProfilePage;
+      userProfilePage = UserProfile(setCurrentPageState: setCurrentPageState);
+      pages[3] = userProfilePage;
+      setCurrentPageState(3);
+    }
+    if (response.statusCode == 401) {
       _showMyDialog(context);
     }
   }

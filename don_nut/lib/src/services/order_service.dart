@@ -1,29 +1,59 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:don_nut/src/models/producto.dart';
 
-class ProductService {
-  Future<List<Producto>> getProducts(url) async {
-    final response = await http.get(Uri.parse(url));
-    List<Producto> products = [];
-    if (response.statusCode == 202) {
-      String body = utf8.decode(response.bodyBytes);
-      final jsonData = jsonDecode(body);
-      for (var i in jsonData["data"]) {
-        products.add(Producto(
-            i['idProducto'],
-            i['nombre'],
-            i['tipo'],
-            i['imgBanner'],
-            i['imgProducto'],
-            i['descripcion'],
-            i['fechaRegistro'],
-            i['precio'],
-            i['estado']));
-      }
-      return products;
-    } else {
-      throw Exception('Error en la conexión');
-    }
+import 'package:don_nut/src/screens/product_info.dart';
+import 'package:don_nut/src/utils/global.dart';
+import 'package:http/http.dart' as http;
+
+class OrderService {
+  //Verifica si el producto ya se encuentra en el carrito del cliente
+  Future<http.Response> getProduct(ProductPageArguments arguments) async {
+    return await http.get(
+        Uri.parse(url +
+            'productoscarritos/producto/' +
+            arguments.idProducto.toString()),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        });
+  }
+
+  //Actualiza la propiedad cantidad de un producto determinado, en el carrito del cliente
+  Future<http.Response> updateProductoCarrito(
+      idProductoCarrito, cantidad) async {
+    return await http.put(
+        Uri.parse(url + 'productoscarritos/' + idProductoCarrito.toString()),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(<String, String>{"cantidad": cantidad.toString()}));
+  }
+
+  //Inserta un nuevo producto en el carrito del cliente
+  Future<http.Response> insertProductoCarrito(
+      ProductPageArguments arguments, cont) async {
+    return await http.post(Uri.parse(url + 'productoscarritos'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(<String, int>{
+          "cantidad": cont,
+          "fk_idProducto": arguments.idProducto
+        }));
+  }
+
+  //Elimina un producto del carrito
+  Future<http.Response> deleteProductoCarrito(idProductoCarrito) async {
+    return await http.delete(
+        Uri.parse(url + 'productoscarritos/' + idProductoCarrito.toString()),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        });
   }
 }

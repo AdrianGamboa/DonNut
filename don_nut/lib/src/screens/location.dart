@@ -1,10 +1,12 @@
 import 'package:don_nut/src/screens/preview_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-String observacionPedido='';
-String latitud='';
-String longitud='';
-final observacionTextController = TextEditingController(); 
+
+String observacionPedido = '';
+String latitud = '';
+String longitud = '';
+final observacionTextController = TextEditingController();
+
 class LocationPage extends StatefulWidget {
   const LocationPage({Key? key}) : super(key: key);
 
@@ -60,9 +62,12 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   void _addMarker(LatLng pos) {
-    print("Latitud:"+double.parse(pos.latitude.toString()).toStringAsFixed(6)+" Longitud:"+double.parse(pos.longitude.toString()).toStringAsFixed(6));
-    latitud=double.parse(pos.latitude.toString()).toStringAsFixed(6);
-    longitud=double.parse(pos.longitude.toString()).toStringAsFixed(6);
+    print("Latitud:" +
+        double.parse(pos.latitude.toString()).toStringAsFixed(6) +
+        " Longitud:" +
+        double.parse(pos.longitude.toString()).toStringAsFixed(6));
+    latitud = double.parse(pos.latitude.toString()).toStringAsFixed(6);
+    longitud = double.parse(pos.longitude.toString()).toStringAsFixed(6);
     setState(() {
       _destination = Marker(
         markerId: const MarkerId('destination'),
@@ -103,10 +108,11 @@ class SetLocation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     final arguments =
-    ModalRoute.of(context)!.settings.arguments as LocationDetailArguments;
-    observacionPedido=arguments.observacionPedido;
+        ModalRoute.of(context)!.settings.arguments as LocationDetailArguments;
+    observacionPedido = arguments.observacionPedido;
+    latitud = '';
+    longitud = '';
     return SingleChildScrollView(
       controller: scrollController,
       child: Padding(
@@ -170,26 +176,34 @@ class SetLocation extends StatelessWidget {
                   ),
                 ),
               ),
-              
             ),
             SizedBox(
               width: 300,
-              child:ElevatedButton(
-            child: const Text("Confirmar"),
-            onPressed: (){ Navigator.of(context).pushNamed("/preview",
-            arguments: PreviewDetailArguments(observacionPedido: observacionPedido, observacionUbicacion: observacionTextController.text, ubicLatitud: latitud, ubicLongitud: longitud));},
-            style: ElevatedButton.styleFrom(
-              primary: const Color(0xffAD53AE),
-              onPrimary: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
+              child: ElevatedButton(
+                child: const Text("Confirmar"),
+                onPressed: () {
+                  if (latitud != '' && longitud != '') {
+                    Navigator.of(context).pushNamed("/preview",
+                        arguments: PreviewDetailArguments(
+                            observacionPedido: observacionPedido,
+                            observacionUbicacion:
+                                observacionTextController.text,
+                            ubicLatitud: latitud,
+                            ubicLongitud: longitud));
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: const Color(0xffAD53AE),
+                  onPrimary: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  textStyle: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
               ),
-              textStyle:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
-          ),),
-              
-          const SizedBox(
+            const SizedBox(
               height: 10,
             ),
           ],
@@ -197,13 +211,11 @@ class SetLocation extends StatelessWidget {
       ),
     );
   }
-  
-}
-class LocationDetailArguments {
-  String observacionPedido;
-  LocationDetailArguments(
-      {
-        required this.observacionPedido,
-     });
 }
 
+class LocationDetailArguments {
+  String observacionPedido;
+  LocationDetailArguments({
+    required this.observacionPedido,
+  });
+}

@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:don_nut/src/services/order_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 
 class ProductInfoPage extends StatefulWidget {
   const ProductInfoPage({Key? key}) : super(key: key);
@@ -9,7 +13,9 @@ class ProductInfoPage extends StatefulWidget {
 }
 
 class _ProductInfoPageState extends State<ProductInfoPage> {
+  OrderService orderServices = OrderService();
   int cont = 1;
+
   void contadorMas() {
     if (cont > -1 && cont < 99) {
       setState(() {
@@ -211,7 +217,12 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
                 child: ElevatedButton(
                   child: Text("Agregar al pedido ₡" +
                       (int.parse(arguments.costo) * cont).toString()),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (GetStorage().read('email') != null ||
+                        GetStorage().read('password') != null) {
+                      addProduct(arguments);
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     primary: const Color(0xffAD53AE),
                     onPrimary: Colors.white,
@@ -228,15 +239,43 @@ class _ProductInfoPageState extends State<ProductInfoPage> {
       ),
     );
   }
+
+  addProduct(ProductPageArguments arguments) async {
+    final responseProduct = await orderServices.getProduct(arguments);
+
+    if (responseProduct.statusCode == 200) {
+      String body = utf8.decode(responseProduct.bodyBytes);
+      final jsonData = jsonDecode(body);
+
+      final idProductoCarrito = jsonData["data"]['idProductoCarrito'];
+      final cantidad = jsonData["data"]['cantidad'] + cont;
+
+      final responseUpdate = await orderServices.updateProductoCarrito(
+          idProductoCarrito, cantidad);
+
+      if (responseUpdate.statusCode == 202) {
+        Navigator.pop(context);
+      }
+    } else if (responseProduct.statusCode == 400) {
+      final responseInsert =
+          await orderServices.insertProductoCarrito(arguments, cont);
+
+      if (responseInsert.statusCode == 202) {
+        Navigator.pop(context);
+      }
+    }
+  }
 }
 
 class ProductPageArguments {
+  int idProducto;
   String nombre;
   String descripcion;
   String costo;
   String imagen;
   ProductPageArguments(
-      {required this.nombre,
+      {required this.idProducto,
+      required this.nombre,
       required this.descripcion,
       required this.costo,
       required this.imagen});

@@ -1,7 +1,6 @@
 import 'package:don_nut/src/models/producto.dart';
 import 'package:don_nut/src/screens/product_info.dart';
 
-import 'package:don_nut/src/services/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -24,8 +23,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
-  ProductService productServices = ProductService();
-
   final List<String> listCategories = [
     //Sacar las categorias de bd
     'Top Ventas',
@@ -191,6 +188,7 @@ List<Widget> _listProducts(data, category, context) {
           onTap: () {
             Navigator.of(context).pushNamed("/product_info",
                 arguments: ProductPageArguments(
+                    idProducto: item.idProducto,
                     nombre: item.nombre,
                     descripcion: item.descripcion,
                     costo: item.precio,
@@ -214,10 +212,10 @@ List<Widget> _listProducts(data, category, context) {
             child: Column(children: [
               const SizedBox(height: 10),
               Image.network(
-                'https://media.discordapp.net/attachments/775922349362642955/907742592479944774/unknown.png',
+                item.imgProducto,
                 height: 91,
-                width: 102,
-                alignment: Alignment.topCenter,
+                width: 130,
+                alignment: Alignment.center,
               ),
               const SizedBox(height: 5),
               Container(
@@ -250,16 +248,25 @@ Widget _getBanners(data, context) {
   List<Widget> banners = [];
   // ignore: unused_local_variable
   for (var item in data) {
-    banners.add(Container(
-        width: 260,
-        decoration: const BoxDecoration(color: Color(0xffC4C2C2)),
-        constraints: const BoxConstraints(
-          maxWidth: 260,
-        ),
-        child: Image.network(
-          'https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OHx8Y2hhbmdlfGVufDB8fDB8fA%3D%3D&w=1000&q=80', //item.imgBanner,
-          fit: BoxFit.fill,
-        )));
+    banners.add(TextButton(
+      onPressed: () {
+        Navigator.of(context).pushNamed("/product_info",
+            arguments: ProductPageArguments(
+                idProducto: item.idProducto,
+                nombre: item.nombre,
+                descripcion: item.descripcion,
+                costo: item.precio,
+                imagen: item.imgProducto));
+      },
+      child: Container(
+          width: 260,
+          height: 260,
+          decoration: const BoxDecoration(color: Color(0xffC4C2C2)),
+          child: Image.network(
+            item.imgBanner,
+            fit: BoxFit.fill,
+          )),
+    ));
   }
 
   return Container(
