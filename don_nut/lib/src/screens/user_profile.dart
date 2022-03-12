@@ -4,7 +4,6 @@ import 'package:don_nut/src/screens/login.dart';
 import 'package:don_nut/src/services/auth_service.dart';
 import 'package:don_nut/src/utils/global.dart' as globals;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';

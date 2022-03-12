@@ -69,6 +69,12 @@ class PreviewPageState extends State<PreviewPage> {
   Widget build(BuildContext context) {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as PreviewDetailArguments;
+    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(arguments.observacionPedido)) {
+      arguments.observacionPedido = 'Sin observación';
+    }
+    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(arguments.observacionUbicacion)) {
+      arguments.observacionUbicacion = 'Sin observación';
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
@@ -150,12 +156,7 @@ class PreviewPageState extends State<PreviewPage> {
               ),
             ),
             const SizedBox(height: 20),
-            const Divider(
-              indent: 30,
-              endIndent: 30,
-              thickness: 1,
-              color: Colors.black,
-            ),
+            
             Container(
               margin: const EdgeInsets.all(30.0),
               child: Row(
@@ -266,13 +267,6 @@ class PreviewPageState extends State<PreviewPage> {
 
   Future<http.Response> sendLocation(
       latitud, longitud, observacionUbicacion, observacionPedido) async {
-    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(observacionPedido)) {
-      observacionPedido = 'Sin observación';
-    }
-    if (!RegExp(r'^[A-Za-z0-9_.]+$').hasMatch(observacionUbicacion)) {
-      observacionUbicacion = 'Sin observación';
-    }
-
     var resBody = {};
 
     resBody["ubicLatitud"] = latitud;

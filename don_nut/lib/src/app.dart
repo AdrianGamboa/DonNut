@@ -1,3 +1,4 @@
+import 'package:don_nut/src/screens/history_detail.dart';
 import 'package:don_nut/src/screens/loading_page.dart';
 import 'package:don_nut/src/screens/delivery_detail.dart';
 import 'package:don_nut/src/screens/location.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         "/preparation_detail": (BuildContext context) =>
             const PreparationDetail(),
         "/delivery_detail": (BuildContext context) => const DeliveryDetail(),
+        "/history_detail": (BuildContext context) => const HistoryDetail(),
       },
     );
   }

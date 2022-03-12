@@ -1,4 +1,6 @@
 import 'package:don_nut/src/models/order.dart';
+import 'package:don_nut/src/models/order_original.dart';
+import 'package:don_nut/src/services/order_original_service.dart';
 import 'package:don_nut/src/services/order_service.dart';
 import 'package:don_nut/src/services/product_service.dart';
 import 'package:flutter/gestures.dart';
@@ -6,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'dart:async';
 import 'package:don_nut/src/utils/global.dart' as globals;
-
+import 'history_detail.dart';
 import 'location.dart';
 
 final observacionPedidoTextController = TextEditingController();
@@ -27,24 +29,29 @@ OrderService orderServices = OrderService();
 class OrderPageState extends State<OrderPage> {
   ProductService productServices = ProductService();
   OrderService orderServices = OrderService();
-
+  OrderOriginalService orderOriginalService = OrderOriginalService();
+ 
   late Future<List<Order>?> _listOrder; //Lista del carrito
+  late Future<List<OrderOriginal>?> _historyOrders;// Historial de pedidos 
   int cont = 1;
   //Lo primero que se ejecuta al abrir la pantalla
   @override
   void initState() {
     super.initState();
     _listOrder = productServices.getOrder(globals.url + "productoscarritos");
+    _historyOrders= orderOriginalService.getHistory(globals.url+ "pedidos/lista/historial");
   }
-
+ 
   @override
   Widget build(BuildContext context) {
     subtotal = 0;
-    return Scaffold(
+    return DefaultTabController (
+      length: 2,
+      child: Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         //Barra superior de la pantalla
-        preferredSize: const Size.fromHeight(60.0),
+        preferredSize: const Size.fromHeight(100.0),
         child: AppBar(
           backgroundColor: Colors.white,
           iconTheme: const IconThemeData(color: Colors.black),
@@ -54,11 +61,51 @@ class OrderPageState extends State<OrderPage> {
                 'https://media.discordapp.net/attachments/775922349362642955/906604815361134592/logo.png?width=998&height=676',
                 height: 70,
                 width: 70),
-            TextButton(
-              style: TextButton.styleFrom(
-                  textStyle: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                  primary: Colors.black),
+            
+          ]),
+          elevation: 0,
+          bottom: const TabBar(
+            indicatorColor: Color(0xffAD53AE),
+            unselectedLabelColor: Color(0xff707070),
+            labelColor: Color(0xffAD53AE),
+            tabs: [
+              Tab(
+                child: Text(
+                  'Carrito',
+                ),
+              ),
+              Tab(
+                child: Text(
+                  'Historial Pedidos',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: TabBarView(
+          children: [
+            SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
+              child: Column(
+                children: [
+                  const SizedBox(height: 20,),
+                  SizedBox(
+                    width: 500,
+                    child: Row(
+                      children: [
+                        const Expanded(
+                          child: Text("Mi pedido",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w500)),
+                        ),
+                              IconButton(
+              icon: const Icon(Icons.edit),
               onPressed: () {
                 setState(() {
                   if (!_isVisible) {
@@ -69,26 +116,9 @@ class OrderPageState extends State<OrderPage> {
                   }
                 });
               },
-              child: const Text('Editar'),
             ),
-          ]),
-          elevation: 0,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 30, right: 30, top: 10),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    width: 500,
-                    child: Text("Mi pedido",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500)),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 20),
                   ReRunnableFutureBuilder(_listOrder,
@@ -124,7 +154,7 @@ class OrderPageState extends State<OrderPage> {
                   right: 30, left: 30, top: 20, bottom: 20),
               width: 400,
               child: ElevatedButton(
-                child: const Text("Procesar pedido"),
+                child: const Text("Procesar pedido",style:TextStyle(fontWeight: FontWeight.w500),),
                 onPressed: () {
                   Navigator.of(context)
                       .pushNamed("/location",
@@ -150,9 +180,28 @@ class OrderPageState extends State<OrderPage> {
           ],
         ),
       ),
+
+     SingleChildScrollView(
+      child: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 10,),
+            ReRunnableHistoryFutureBuilder(_historyOrders,
+                      getHistory: getHistoryOrders,) 
+           
+          ],
+        ),
+      ),
+    ),
+           
+            
+            
+          ],
+      
+    ),
+      ),
     );
   }
-
   void showObservationPage() {
     showModalBottomSheet(
         shape: const RoundedRectangleBorder(
@@ -324,6 +373,59 @@ class OrderPageState extends State<OrderPage> {
     }
 
     return products;
+  }
+  List<Widget> getHistoryOrders(data, context) {
+    List<Widget> orders = [];
+  for (var item in data) {
+   
+      orders.add(
+        
+            TextButton(onPressed: () {
+              Navigator.of(context).pushNamed("/history_detail",
+                arguments: HistoryDetailArguments(
+                    idPedido: item.idOrden,
+                    estado:item.estado,
+                    fechaRegistro: item.fechaRegistro
+                    ));
+            }, child: Column(
+              children: [
+                const SizedBox(height: 5,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30,right: 30),
+                      child: Text("Pedido #"+item.idOrden.toString(),style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w600, fontSize: 16),),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 30,right: 30),
+                      child: Text(item.estado,style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w400, fontSize: 16)),
+                    ),
+                  ],
+                ),
+                const Divider(
+                indent: 20,
+                endIndent: 20,
+                thickness: 0.3,
+                color: Colors.black,
+              ),
+               Padding(
+                 padding: const EdgeInsets.only(right: 20),
+                 child: Row(
+                   mainAxisAlignment: MainAxisAlignment.end,
+                   children: [
+                     
+                     Text(item.fechaRegistro,style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w400, fontSize: 12,)),
+                   ],
+                 ),
+               ),
+              
+              ],
+            ),style: TextButton.styleFrom(primary: const Color(0xffAD53AE))),
+      );
+    }
+    
+    return orders;
   }
 
   void showEditPage(nombre, precio, idProductoCarrito) {
@@ -553,6 +655,47 @@ class ReRunnableFutureBuilder extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
+            );
+          }
+        });
+  }
+}
+
+class ReRunnableHistoryFutureBuilder extends StatelessWidget {
+  final Future<List<OrderOriginal>?> _future;
+  final Function getHistory;
+
+  const ReRunnableHistoryFutureBuilder(this._future,
+      {Key? key, required this.getHistory})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: _future,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+                child: Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: CircularProgressIndicator()));
+          }
+          if (snapshot.hasError) {
+            return const Text("Error al extraer la información");
+          }
+
+          if (!snapshot.hasData) {
+            return const Text("Aún no se encuentran pedidos");
+          } else {
+            return Column(
+              children: [
+                ListView(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    primary: false,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: getHistory(snapshot.data, context)),
               ],
             );
           }

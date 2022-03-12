@@ -4,7 +4,7 @@ class OrderOriginal {
   int idOrden;
   String? fechaRegistro;
   String? estado;
-  User user;
+  User? user;
   
 
   OrderOriginal(

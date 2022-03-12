@@ -15,6 +15,7 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
+  
   bool banderaAgrandar = false;
   static const _initialCameraPosition = CameraPosition(
     target: LatLng(9.373786, -83.703023),
@@ -24,6 +25,13 @@ class _LocationPageState extends State<LocationPage> {
       markerId: const MarkerId('destination'),
       infoWindow: const InfoWindow(title: 'Destination'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed));
+  @override
+  void initState() {
+    super.initState();
+    latitud = '';
+    longitud = '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,8 +119,6 @@ class SetLocation extends StatelessWidget {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as LocationDetailArguments;
     observacionPedido = arguments.observacionPedido;
-    latitud = '';
-    longitud = '';
     return SingleChildScrollView(
       controller: scrollController,
       child: Padding(
@@ -186,8 +192,7 @@ class SetLocation extends StatelessWidget {
                     Navigator.of(context).pushNamed("/preview",
                         arguments: PreviewDetailArguments(
                             observacionPedido: observacionPedido,
-                            observacionUbicacion:
-                                observacionTextController.text,
+                            observacionUbicacion:observacionTextController.text.toString(),
                             ubicLatitud: latitud,
                             ubicLongitud: longitud));
                   }

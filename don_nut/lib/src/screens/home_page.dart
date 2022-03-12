@@ -217,22 +217,28 @@ List<Widget> _listProducts(data, category, context) {
                 width: 130,
                 alignment: Alignment.center,
               ),
-              const SizedBox(height: 5),
               Container(
                   height: 45,
+                  margin: const EdgeInsets.only(bottom: 8, top: 5),
+                  padding: const EdgeInsets.only(right: 8, left: 8),
                   alignment: Alignment.center,
                   child: AutoSizeText(item.nombre,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                           fontSize: 20, color: Color(0xff707070)))),
-              const SizedBox(height: 8),
-              AutoSizeText(
-                '₡' + item.precio,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: Color(0xffAD53AE),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20),
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.only(right: 8, left: 8),
+                alignment: Alignment.center,
+                child: AutoSizeText(
+                  '₡' + item.precio,
+                  maxLines: 1,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      color: Color(0xffAD53AE),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20),
+                ),
               ),
             ]),
           ),

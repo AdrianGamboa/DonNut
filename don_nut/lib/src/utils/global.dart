@@ -1,6 +1,5 @@
 import 'package:don_nut/src/models/user.dart';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 var url = 'http://esteban-progra4.mywebcommunity.org/api/';
