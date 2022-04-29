@@ -95,7 +95,7 @@ class _PreparationPage extends State<PreparationPage> {
                   children: [
                     Text("Pedido #"+item.idOrden.toString(),style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w600, fontSize: 16),),
                     const SizedBox(width: 120,),
-                    Text(item.user.nombre+" "+item.user.pApellido,style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w400, fontSize: 16)),
+                    Text(item.user.nombre+" "+item.user.primerApellido,style: const TextStyle(color: Color(0xff707070),fontWeight: FontWeight.w400, fontSize: 16)),
                   ],
                 ),
                 const Divider(
